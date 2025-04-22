@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Personal Finance Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+</head>
+<body class="bg-[#fafafa] text-gray-900 font-sans min-h-screen">
+    <div id="app" class="min-h-screen flex flex-col">
+        <!-- Login Screen -->
+        <div id="login-screen" class="flex flex-col items-center justify-center min-h-screen px-4">
+            <div class="w-full max-w-md">
+                <div class="text-center mb-8">
+                    <img src="logo.svg" alt="Finance Manager Logo" class="w-16 h-16 mx-auto mb-4">
+                    <h1 class="text-2xl font-semibold">Personal Finance Manager</h1>
+                    <p class="text-gray-500 mt-2">Manage your finances with ease</p>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-8">
+                    <h2 class="text-xl font-medium mb-6">Sign in to your account</h2>
+                    
+                    <form id="login-form" class="space-y-4">
+                        <div>
+                            <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                            <input type="text" id="username" name="username" class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        
+                        <div>
+                            <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                            <input type="password" id="password" name="password" class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <label for="remember-me" class="ml-2 block text-sm text-gray-700">Remember me</label>
+                            </div>
+                            
+                            <div class="text-sm">
+                                <a href="#" class="font-medium text-blue-600 hover:text-blue-500">Forgot password?</a>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Sign in
+                        </button>
+                        
+                        <div class="text-center text-sm text-gray-500 mt-4">
+                            <span>Don't have an account?</span>
+                            <a href="#" class="font-medium text-blue-600 hover:text-blue-500">Sign up</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main App (initially hidden) -->
+        <div id="main-app" class="hidden flex flex-col min-h-screen">
+            <!-- Header -->
+            <header class="bg-white border-b border-gray-200">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex justify-between h-16">
+                        <div class="flex">
+                            <div class="flex-shrink-0 flex items-center">
+                                <img src="logo.svg" alt="Finance Manager Logo" class="w-8 h-8 mr-2">
+                                <span class="font-semibold text-lg">Finance Manager</span>
+                            </div>
+                            <nav class="ml-6 flex space-x-8 items-center">
+                                <a href="#dashboard" class="nav-link active border-blue-500 text-blue-600">Dashboard</a>
+                                <a href="#transactions" class="nav-link border-transparent">Transactions</a>
+                                <a href="#goals" class="nav-link border-transparent">Savings Goals</a>
+                                <a href="#reports" class="nav-link border-transparent">Reports</a>
+                            </nav>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="relative">
+                                <button id="user-menu-button" class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                    <span class="sr-only">Open user menu</span>
+                                    <div class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
+                                        <i class='bx bx-user text-gray-500'></i>
+                                    </div>
+                                    <span class="ml-2 text-sm font-medium text-gray-700" id="current-user">User</span>
+                                    <i class='bx bx-chevron-down ml-1 text-gray-400'></i>
+                                </button>
+                                <div id="user-dropdown" class="hidden origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
+                                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Your Profile</a>
+                                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
+                                    <a href="#" id="logout-button" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign out</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Main Content -->
+            <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                <!-- Dashboard Section -->
+                <section id="dashboard-section" class="space-y-6">
+                    <div class="flex items-center justify-between">
+                        <h1 class="text-2xl font-semibold">Dashboard</h1>
+                        <div class="flex space-x-3">
+                            <span class="text-sm text-gray-500">Last updated: <span id="last-updated">Today, 10:30 AM</span></span>
+                            <button class="text-sm text-blue-600 hover:text-blue-500">
+                                <i class='bx bx-refresh'></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Summary Cards -->
+                    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                        <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-100">
+                            <div class="px-4 py-5 sm:p-6">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 bg-blue-50 rounded-md p-3">
+                                        <i class='bx bx-wallet text-blue-600 text-xl'></i>
+                                    </div>
+                                    <div class="ml-5 w-0 flex-1">
+                                        <dl>
+                                            <dt class="text-sm font-medium text-gray-500 truncate">Total Balance</dt>
+                                            <dd>
+                                                <div class="text-lg font-semibold text-gray-900">¥12,345.67</div>
+                                            </dd>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-100">
+                            <div class="px-4 py-5 sm:p-6">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 bg-green-50 rounded-md p-3">
+                                        <i class='bx bx-trending-up text-green-600 text-xl'></i>
+                                    </div>
+                                    <div class="ml-5 w-0 flex-1">
+                                        <dl>
+                                            <dt class="text-sm font-medium text-gray-500 truncate">Income (This Month)</dt>
+                                            <dd>
+                                                <div class="text-lg font-semibold text-gray-900">¥8,230.00</div>
+                                            </dd>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-100">
+                            <div class="px-4 py-5 sm:p-6">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 bg-red-50 rounded-md p-3">
+                                        <i class='bx bx-trending-down text-red-600 text-xl'></i>
+                                    </div>
+                                    <div class="ml-5 w-0 flex-1">
+                                        <dl>
+                                            <dt class="text-sm font-medium text-gray-500 truncate">Expenses (This Month)</dt>
+                                            <dd>
+                                                <div class="text-lg font-semibold text-gray-900">¥5,678.90</div>
+                                            </dd>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-100">
+                            <div class="px-4 py-5 sm:p-6">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 bg-purple-50 rounded-md p-3">
+                                        <i class='bx bx-target-lock text-purple-600 text-xl'></i>
+                                    </div>
+                                    <div class="ml-5 w-0 flex-1">
+                                        <dl>
+                                            <dt class="text-sm font-medium text-gray-500 truncate">Savings Progress</dt>
+                                            <dd>
+                                                <div class="text-lg font-semibold text-gray-900">78%</div>
+                                                <div class="mt-1 w-full bg-gray-200 rounded-full h-2">
+                                                    <div class="bg-purple-600 h-2 rounded-full" style="width: 78%"></div>
+                                                </div>
+                                            </dd>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Actions -->
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+                        <h2 class="text-lg font-medium mb-4">Quick Actions</h2>
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                            <button id="btn-add-transaction" class="flex items-center justify-between p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                                <span class="font-medium text-blue-700">Add Transaction</span>
+                                <i class='bx bx-plus-circle text-blue-600 text-xl'></i>
+                            </button>
+                            
+                            <button id="btn-import-csv" class="flex items-center justify-between p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+                                <span class="font-medium text-green-700">Import CSV</span>
+                                <i class='bx bx-import text-green-600 text-xl'></i>
+                            </button>
+                            
+                            <button id="btn-set-budget" class="flex items-center justify-between p-4 bg-yellow-50 rounded-lg hover:bg-yellow-100 transition-colors">
+                                <span class="font-medium text-yellow-700">Set Budget</span>
+                                <i class='bx bx-coin-stack text-yellow-600 text-xl'></i>
+                            </button>
+                            
+                            <button id="btn-savings-goal" class="flex items-center justify-between p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
+                                <span class="font-medium text-purple-700">Savings Goal</span>
+                                <i class='bx bx-target-lock text-purple-600 text-xl'></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Transactions -->
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="text-lg font-medium">Recent Transactions</h2>
+                            <a href="#transactions" class="text-sm text-blue-600 hover:text-blue-500">View all</a>
+                        </div>
+                        
+                        <div class="overflow-hidden">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200" id="recent-transactions-list">
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2023-04-15</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Grocery Shopping</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Food</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600">-¥328.45</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2023-04-14</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Monthly Salary</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Income</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600">+¥8,230.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2023-04-13</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Electric Bill</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Utilities</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600">-¥156.78</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2023-04-10</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Transportation</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">Transport</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600">-¥45.00</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Transactions Section (initially hidden) -->
+                <section id="transactions-section" class="hidden space-y-6">
+                    <div class="flex items-center justify-between">
+                        <h1 class="text-2xl font-semibold">Transactions</h1>
+                        <div class="flex space-x-3">
+                            <button id="btn-add-transaction-page" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                <i class='bx bx-plus mr-2'></i> Add Transaction
+                            </button>
+                            <button id="btn-import-csv-page" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                <i class='bx bx-import mr-2'></i> Import CSV
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Filters -->
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+                        <div class="flex flex-wrap gap-4">
+                            <div class="flex-1 min-w-[200px]">
+                                <label for="category-filter" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                                <select id="category-filter" class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">All Categories</option>
+                                    <option value="food">Food</option>
+                                    <option value="transport">Transport</option>
+                                    <option value="utilities">Utilities</option>
+                                    <option value="entertainment">Entertainment</option>
+                                    <option value="income">Income</option>
+                                </select>
+                            </div>
+                            
+                            <div class="flex-1 min-w-[200px]">
+                                <label for="date-from" class="block text-sm font-medium text-gray-700 mb-1">Date From</label>
+                                <input type="date" id="date-from" class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            
+                            <div class="flex-1 min-w-[200px]">
+                                <label for="date-to" class="block text-sm font-medium text-gray-700 mb-1">Date To</label>
+                                <input type="date" id="date-to" class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            
+                            <div class="flex-1 min-w-[200px]">
+                                <label for="amount-min" class="block text-sm font-medium text-gray-700 mb-1">Min Amount</label>
+                                <input type="number" id="amount-min" placeholder="0" class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            
+                            <div class="flex-1 min-w-[200px]">
+                                <label for="amount-max" class="block text-sm font-medium text-gray-700 mb-1">Max Amount</label>
+                                <input type="number" id="amount-max" placeholder="Any" class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            
+                            <div class="flex items-end">
+                                <button id="btn-apply-filters" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                    Apply Filters
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Transactions Table -->
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+                        <div class="overflow-hidden">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200" id="transactions-list">
+                                    <!-- Transactions will be loaded here -->
+                                </tbody>
+                            </table>
+                            
+                            <div id="no-transactions" class="hidden py-8 text-center">
+                                <p class="text-gray-500">No transactions found.</p>
+                            </div>
+                            
+                            <div class="flex items-center justify-between border-t border-gray-200 px-4 py-3 sm:px-6 mt-4">
+                                <div class="flex flex-1 justify-between sm:hidden">
+                                    <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Previous</a>
+                                    <a href="#" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Next</a>
+                                </div>
+                                <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                                    <div>
+                                        <p class="text-sm text-gray-700">
+                                            Showing <span class="font-medium">1</span> to <span class="font-medium">10</span> of <span class="font-medium">20</span> results
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                                            <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                                <span class="sr-only">Previous</span>
+                                                <i class='bx bx-chevron-left'></i>
+                                            </a>
+                                            <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">1</a>
+                                            <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">2</a>
+                                            <a href="#" class="hidden md:inline-flex relative items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">3</a>
+                                            <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">...</span>
+                                            <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">8</a>
+                                            <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">9</a>
+                                            <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">10</a>
+                                            <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                                <span class="sr-only">Next</span>
+                                                <i class='bx bx-chevron-right'></i>
+                                            </a>
+                                        </nav>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Savings Goals Section (initially hidden) -->
+                <section id="goals-section" class="hidden space-y-6">
+                    <div class="flex items-center justify-between">
+                        <h1 class="text-2xl font-semibold">Savings Goals</h1>
+                        <button id="btn-add-goal" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <i class='bx bx-plus mr-2'></i> Add Goal
+                        </button>
+                    </div>
+                    
+                    <!-- Goals List -->
+                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="text-lg font-medium text-gray-900">New Laptop</h3>
+                                    <p class="text-sm text-gray-500 mt-1">Target Date: Dec 31, 2023</p>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button class="text-gray-400 hover:text-gray-500">
+                                        <i class='bx bx-edit-alt'></i>
+                                    </button>
+                                    <button class="text-gray-400 hover:text-red-500">
+                                        <i class='bx bx-trash'></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="text-sm font-medium text-gray-700">Progress</span>
+                                    <span class="text-sm font-medium text-gray-700">65%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                    <div class="bg-blue-600 h-2.5 rounded-full" style="width: 65%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 flex justify-between items-center">
+                                <div>
+                                    <p class="text-sm text-gray-500">Saved</p>
+                                    <p class="text-lg font-semibold text-gray-900">¥6,500</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Target</p>
+                                    <p class="text-lg font-semibold text-gray-900">¥10,000</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Remaining</p>
+                                    <p class="text-lg font-semibold text-gray-900">¥3,500</p>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-6">
+                                <button class="w-full flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                    <i class='bx bx-plus-circle mr-2'></i> Add Funds
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="text-lg font-medium text-gray-900">Vacation Trip</h3>
+                                    <p class="text-sm text-gray-500 mt-1">Target Date: Jul 15, 2023</p>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button class="text-gray-400 hover:text-gray-500">
+                                        <i class='bx bx-edit-alt'></i>
+                                    </button>
+                                    <button class="text-gray-400 hover:text-red-500">
+                                        <i class='bx bx-trash'></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="text-sm font-medium text-gray-700">Progress</span>
+                                    <span class="text-sm font-medium text-gray-700">30%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                    <div class="bg-purple-600 h-2.5 rounded-full" style="width: 30%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 flex justify-between items-center">
+                                <div>
+                                    <p class="text-sm text-gray-500">Saved</p>
+                                    <p class="text-lg font-semibold text-gray-900">¥3,000</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Target</p>
+                                    <p class="text-lg font-semibold text-gray-900">¥10,000</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Remaining</p>
+                                    <p class="text-lg font-semibold text-gray-900">¥7,000</p>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-6">
+                                <button class="w-full flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                    <i class='bx bx-plus-circle mr-2'></i> Add Funds
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="text-lg font-medium text-gray-900">Emergency Fund</h3>
+                                    <p class="text-sm text-gray-500 mt-1">No Target Date</p>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button class="text-gray-400 hover:text-gray-500">
+                                        <i class='bx bx-edit-alt'></i>
+                                    </button>
+                                    <button class="text-gray-400 hover:text-red-500">
+                                        <i class='bx bx-trash'></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="text-sm font-medium text-gray-700">Progress</span>
+                                    <span class="text-sm font-medium text-gray-700">85%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                    <div class="bg-green-600 h-2.5 rounded-full" style="width: 85%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 flex justify-between items-center">
+                                <div>
+                                    <p class="text-sm text-gray-500">Saved</p>
+                                    <p class="text-lg font-semibold text-gray-900">¥42,500</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Target</p>
+                                    <p class="text-lg font-semibold text-gray-900">¥50,000</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Remaining</p>
+                                    <p class="text-lg font-semibold text-gray-900">¥7,500</p>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-6">
+                                <button class="w-full flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                    <i class='bx bx-plus-circle mr-2'></i> Add Funds
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Report Section (initially hidden) -->
+                <section id="reports-section" class="hidden space-y-6">
+                    <h1 class="text-2xl font-semibold">Financial Reports</h1>
+                    <p class="text-gray-500">Analyze your spending patterns and financial health.</p>
+                    
+                    <!-- Report content would go here -->
+                </section>
+            </main>
+            
+            <footer class="bg-white border-t border-gray-200 py-4">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <p class="text-center text-sm text-gray-500">
+                        Built with <a href="https://flowith.net" target="_blank" class="text-blue-600 hover:text-blue-500">Flowith Oracle</a>.
+                    </p>
+                </div>
+            </footer>
+        </div>
+        
+        <!-- Modals -->
+        <!-- Add Transaction Modal -->
+        <div id="add-transaction-modal" class="hidden fixed inset-0 overflow-y-auto z-50">
+            <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                    <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+                </div>
+                
+                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                        <div class="sm:flex sm:items-start">
+                            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                                <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Add Transaction</h3>
+                                
+                                <div class="mt-2 space-y-4">
+                                    <div>
+                                        <label for="transaction-date" class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                                        <input type="date" id="transaction-date" class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="transaction-description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                                        <input type="text" id="transaction-description" class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g. Grocery Shopping">
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="transaction-amount" class="block text-sm font-medium text-gray-700 mb-1">Amount (¥)</label>
+                                        <input type="number" id="transaction-amount" class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0.00" step="0.01">
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="transaction-type" class="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                                        <select id="transaction-type" class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                            <option value="expense">Expense</option>
+                                            <option value="income">Income</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="transaction-category" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                                        <select id="transaction-category" class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                            <option value="food">Food</option>
+                                            <option value="transport">Transport</option>
+                                            <option value="utilities">Utilities</option>
+                                            <option value="entertainment">Entertainment</option>
+                                            <option value="income">Income</option>
+                                            <option value="other">Other</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="transaction-notes" class="block text-sm font-medium text-gray-700 mb-1">Notes (Optional)</label>
+                                        <textarea id="transaction-notes" rows="2" class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Additional details..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                        <button id="btn-save-transaction" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                            Save Transaction
+                        </button>
+                        <button id="btn-cancel-transaction" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Import CSV Modal -->
+        <div id="import-csv-modal" class="hidden fixed inset-0 overflow-y-auto z-50">
+            <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                    <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+                </div>
+                
+                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                        <div class="sm:flex sm:items-start">
+                            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                                <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Import Transactions from CSV</h3>
+                                
+                                <div class="mt-2 space-y-4">
+                                    <div class="bg-gray-50 p-4 rounded-md">
+                                        <p class="text-sm text-gray-500">Upload a CSV file with your transaction data. The file should have columns for date, description, amount, and category.</p>
+                                        <p class="text-sm text-gray-500 mt-1">Sample format: 2023-04-15,Grocery Shopping,-328.45,Food</p>
+                                    </div>
+                                    
+                                    <div class="border-2 border-dashed border-gray-300 rounded-md px-6 pt-5 pb-6 flex justify-center">
+                                        <div class="space-y-1 text-center">
+                                            <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                                                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                            </svg>
+                                            <div class="flex text-sm text-gray-600">
+                                                <label for="file-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
+                                                    <span>Upload a file</span>
+                                                    <input id="file-upload" name="file-upload" type="file" class="sr-only" accept=".csv">
+                                                </label>
+                                                <p class="pl-1">or drag and drop</p>
+                                            </div>
+                                            <p class="text-xs text-gray-500">CSV up to 10MB</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div id="csv-preview" class="hidden">
+                                        <h4 class="text-sm font-medium text-gray-700 mb-2">File Preview</h4>
+                                        <div class="max-h-40 overflow-y-auto bg-gray-50 p-2 rounded border border-gray-200">
+                                            <table class="min-w-full divide-y divide-gray-200 text-sm">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="csv-preview-content" class="divide-y divide-gray-200">
+                                                    <!-- Preview rows will be added here -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    
+                                    <div id="csv-mapping" class="hidden space-y-4">
+                                        <h4 class="text-sm font-medium text-gray-700">Map CSV Columns</h4>
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label for="date-column" class="block text-sm font-medium text-gray-700 mb-1">Date Column</label>
+                                                <select id="date-column" class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                                    <option value="0">Column 1</option>
+                                                    <option value="1">Column 2</option>
+                                                    <option value="2">Column 3</option>
+                                                </select>
+                                            </div>
+                                            
+                                            <div>
+                                                <label for="description-column" class="block text-sm font-medium text-gray-700 mb-1">Description Column</label>
+                                                <select id="description-column" class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                                    <option value="0">Column 1</option>
+                                                    <option value="1" selected>Column 2</option>
+                                                    <option value="2">Column 3</option>
+                                                </select>
+                                            </div>
+                                            
+                                            <div>
+                                                <label for="amount-column" class="block text-sm font-medium text-gray-700 mb-1">Amount Column</label>
+                                                <select id="amount-column" class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                                    <option value="0">Column 1</option>
+                                                    <option value="1">Column 2</option>
+                                                    <option value="2" selected>Column 3</option>
+                                                </select>
+                                            </div>
+                                            
+                                            <div>
+                                                <label for="category-column" class="block text-sm font-medium text-gray-700 mb-1">Category Column</label>
+                                                <select id="category-column" class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                                    <option value="0">Column 1</option>
+                                                    <option value="1">Column 2</option>
+                                                    <option value="2">Column 3</option>
+                                                    <option value="3" selected>Column 4</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                        <button id="btn-import-csv" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                            Import Transactions
+                        </button>
+                        <button id="btn-cancel-import" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Add Savings Goal Modal -->
+        <div id="add-goal-modal" class="hidden fixed inset-0 overflow-y-auto z-50">
+            <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                    <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+                </div>
+                
+                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                        <div class="sm:flex sm:items-start">
+                            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                                <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Create Savings Goal</h3>
+                                
+                                <div class="mt-2 space-y-4">
+                                    <div>
+                                        <label for="goal-name" class="block text-sm font-medium text-gray-700 mb-1">Goal Name</label>
+                                        <input type="text" id="goal-name" class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g. New Laptop">
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="goal-amount" class="block text-sm font-medium text-gray-700 mb-1">Target Amount (¥)</label>
+                                        <input type="number" id="goal-amount" class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0.00" step="0.01">
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="goal-date" class="block text-sm font-medium text-gray-700 mb-1">Target Date (Optional)</label>
+                                        <input type="date" id="goal-date" class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="goal-initial" class="block text-sm font-medium text-gray-700 mb-1">Initial Contribution (¥)</label>
+                                        <input type="number" id="goal-initial" class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0.00" step="0.01">
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="goal-notes" class="block text-sm font-medium text-gray-700 mb-1">Notes (Optional)</label>
+                                        <textarea id="goal-notes" rows="2" class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Additional details..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                        <button id="btn-save-goal" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                            Create Goal
+                        </button>
+                        <button id="btn-cancel-goal" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="app.js"></script>
+    <script src="login.js"></script>
+    <script src="transactions.js"></script>
+    <script src="goals.js"></script>
+    <script src="csvImport.js"></script>
+    <script src="utils.js"></script>
+    <script>
+        window.addEventListener("wheel", (e)=> {
+            const isPinching = e.ctrlKey
+            if(isPinching) e.preventDefault()
+        }, { passive: false })
+    </script>
+</body>
+</html>
